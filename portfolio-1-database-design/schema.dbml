@@ -1,4 +1,4 @@
-// SwiftRide - Ride-hailing database design
+// Supalogi - Ride-hailing database design
 // Paste this into https://dbdiagram.io to render the ER diagram.
 
 Table cities {

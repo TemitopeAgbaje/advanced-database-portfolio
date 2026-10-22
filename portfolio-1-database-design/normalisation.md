@@ -1,7 +1,7 @@
-# SwiftRide — Normalisation Explanation
+# Supalogi — Normalisation Explanation
 
 **Normalisation** means organising tables so the same fact is never stored twice.
-This avoids wrong data and wasted space. SwiftRide's design is in **3rd Normal Form (3NF)**.
+This avoids wrong data and wasted space. Supalogi's design is in **3rd Normal Form (3NF)**.
 
 ## 1NF — First Normal Form
 Every column holds a single value, and every row is unique.

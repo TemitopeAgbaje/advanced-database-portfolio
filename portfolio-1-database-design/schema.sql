@@ -1,5 +1,5 @@
--- SwiftRide - PostgreSQL schema (Portfolio 1: Database Design)
--- Run with: psql -d swiftride -f schema.sql
+-- Supalogi - PostgreSQL schema (Portfolio 1: Database Design)
+-- Run with: psql -d supalogi -f schema.sql
 
 DROP TABLE IF EXISTS ratings, payments, trips, vehicles, drivers, riders, cities CASCADE;
 

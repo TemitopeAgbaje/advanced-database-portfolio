@@ -1,7 +1,7 @@
 # Portfolio 1 — Database Design and Modelling
 
-**Case study:** SwiftRide, a ride-hailing platform that connects riders to drivers,
-handles trips and payments, and collects ratings.
+**Case study:** Supalogi, a ride-hailing platform that connects riders to drivers,
+handles trips and payments, and collects ratings. Full description: [case-study.md](../case-study.md).
 
 ## Files
 | File | What it is |
@@ -22,9 +22,9 @@ handles trips and payments, and collects ratings.
 
 ## How to run
 ```bash
-createdb swiftride
-psql -d swiftride -f schema.sql
-psql -d swiftride -f seed.sql
+createdb supalogi
+psql -d supalogi -f schema.sql
+psql -d supalogi -f seed.sql
 ```
 
 ## ER diagram
