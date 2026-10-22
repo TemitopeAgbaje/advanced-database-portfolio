@@ -21,11 +21,12 @@ INSERT INTO vehicles (driver_id, plate_no, make, model, color, year) VALUES
     (2, 'LAG-456BB', 'Honda',   'Civic',   'Black',  2021),
     (3, 'ACC-789CC', 'Kia',     'Rio',     'White',  2020);
 
-INSERT INTO trips (rider_id, driver_id, city_id, pickup_addr, dropoff_addr, status, fare, started_at, ended_at) VALUES
-    (1, 1, 1, 'Ikeja',  'Lekki',       'completed', 3500.00, now() - interval '2 hour', now() - interval '1 hour'),
-    (2, 2, 1, 'Yaba',   'Victoria Is', 'completed', 4200.00, now() - interval '3 hour', now() - interval '2 hour'),
-    (3, 1, 2, 'Wuse',   'Maitama',     'completed', 2800.00, now() - interval '1 day',  now() - interval '1 day'),
-    (1, NULL, 1, 'Surulere', 'Ikoyi',   'requested', NULL, NULL, NULL);
+-- Times follow the trip's real order: requested -> started -> ended
+INSERT INTO trips (rider_id, driver_id, city_id, pickup_addr, dropoff_addr, status, fare, requested_at, started_at, ended_at) VALUES
+    (1, 1, 1, 'Ikeja',  'Lekki',       'completed', 3500.00, now() - interval '130 minutes', now() - interval '2 hours', now() - interval '1 hour'),
+    (2, 2, 1, 'Yaba',   'Victoria Is', 'completed', 4200.00, now() - interval '190 minutes', now() - interval '3 hours', now() - interval '2 hours'),
+    (3, 1, 2, 'Wuse',   'Maitama',     'completed', 2800.00, now() - interval '1450 minutes', now() - interval '1 day', now() - interval '1400 minutes'),
+    (1, NULL, 1, 'Surulere', 'Ikoyi',   'requested', NULL, now(), NULL, NULL);
 
 INSERT INTO payments (trip_id, amount, method, status, paid_at) VALUES
     (1, 3500.00, 'card',   'paid', now() - interval '1 hour'),

@@ -50,7 +50,10 @@ CREATE TABLE trips (
     fare         DECIMAL(10,2) CHECK (fare >= 0),
     requested_at TIMESTAMP NOT NULL DEFAULT now(),
     started_at   TIMESTAMP,
-    ended_at     TIMESTAMP
+    ended_at     TIMESTAMP,
+    -- a trip can't start before it is requested, or end before it starts
+    CHECK (started_at IS NULL OR started_at >= requested_at),
+    CHECK (ended_at IS NULL OR ended_at >= started_at)
 );
 
 CREATE TABLE payments (

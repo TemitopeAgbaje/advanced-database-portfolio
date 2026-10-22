@@ -28,5 +28,18 @@ psql -U postgres -d supalogi -f seed.sql
 ```
 
 ## ER diagram
-Paste `schema.dbml` into https://dbdiagram.io, then export the diagram as PNG and
-save it here as `er-diagram.png` for the submission.
+![Supalogi ER diagram](er-diagram.png)
+
+Made by pasting `schema.dbml` into https://dbdiagram.io and exporting as PNG.
+
+## Testing
+The design was tested on PostgreSQL 15 by building the tables, loading the sample
+data, and checking the results.
+
+| Test | What it shows | Evidence |
+|---|---|---|
+| Build tables | `schema.sql` runs with no errors and creates all 7 tables | [1-schema-created.png](screenshots/1-schema-created.png) |
+| Load data | `seed.sql` inserts rows into every table | [2-seed-loaded.png](screenshots/2-seed-loaded.png) |
+| List tables | `\dt` confirms all 7 tables exist | [3-tables-list.png](screenshots/3-tables-list.png) |
+| Read data | `SELECT * FROM trips` returns the sample trips (terminal and pgAdmin) | [4-trips-data.png](screenshots/4-trips-data.png), [4-trips-data-2.png](screenshots/4-trips-data-2.png) |
+| Reject bad data | Inserting a trip that starts before it was requested is refused by a CHECK constraint | [5-constraint-check.png](screenshots/5-constraint-check.png) |
