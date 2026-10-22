@@ -1,5 +1,5 @@
 -- Supalogi - sample data so the design can be tested
--- Run after schema.sql:  psql -d supalogi -f seed.sql
+-- Run after schema.sql:  psql -U postgres -d supalogi -f seed.sql
 
 INSERT INTO cities (name, country) VALUES
     ('Lagos', 'Nigeria'),

@@ -1,5 +1,5 @@
 -- Supalogi - PostgreSQL schema (Portfolio 1: Database Design)
--- Run with: psql -d supalogi -f schema.sql
+-- Run with: psql -U postgres -d supalogi -f schema.sql
 
 DROP TABLE IF EXISTS ratings, payments, trips, vehicles, drivers, riders, cities CASCADE;
 

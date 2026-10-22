@@ -22,9 +22,9 @@ handles trips and payments, and collects ratings. Full description: [case-study.
 
 ## How to run
 ```bash
-createdb supalogi
-psql -d supalogi -f schema.sql
-psql -d supalogi -f seed.sql
+createdb -U postgres supalogi
+psql -U postgres -d supalogi -f schema.sql
+psql -U postgres -d supalogi -f seed.sql
 ```
 
 ## ER diagram
