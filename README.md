@@ -13,7 +13,7 @@ uses this same case study.
 | Folder | Activity |
 |---|---|
 | [portfolio-1-database-design](portfolio-1-database-design/) | Database Design and Modelling |
-| portfolio-2-query-optimisation | Query Processing and Optimisation |
+| [portfolio-2-query-optimisation](portfolio-2-query-optimisation/) | Query Processing and Optimisation |
 | portfolio-3-transactions-concurrency | Transactions and Concurrency |
 | portfolio-4-nosql | NoSQL and Advanced Data Models |
 | portfolio-5-distributed-cloud | Distributed and Cloud Database Exercise |
