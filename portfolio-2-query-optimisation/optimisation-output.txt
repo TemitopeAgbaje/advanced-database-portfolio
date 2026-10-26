@@ -1,0 +1,184 @@
+DROP INDEX
+DROP INDEX
+DROP INDEX
+DROP MATERIALIZED VIEW
+=== Q1 BEFORE ===
+                                                          QUERY PLAN                                                           
+-------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=4918.12..4918.81 rows=6 width=41) (actual time=46.098..49.290 rows=5 loops=1)
+   ->  Gather Merge  (cost=4918.12..4918.81 rows=6 width=41) (actual time=46.097..49.288 rows=5 loops=1)
+         Workers Planned: 1
+         Workers Launched: 1
+         ->  Sort  (cost=3918.11..3918.12 rows=6 width=41) (actual time=31.099..31.101 rows=2 loops=2)
+               Sort Key: requested_at DESC
+               Sort Method: quicksort  Memory: 25kB
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               ->  Parallel Seq Scan on trips  (cost=0.00..3918.03 rows=6 width=41) (actual time=4.588..30.191 rows=2 loops=2)
+                     Filter: (rider_id = 4242)
+                     Rows Removed by Filter: 100028
+ Planning Time: 0.753 ms
+ Execution Time: 49.373 ms
+(13 rows)
+
+CREATE INDEX
+=== Q1 AFTER ===
+                                                                  QUERY PLAN                                                                   
+-----------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=46.62..46.65 rows=11 width=41) (actual time=0.043..0.044 rows=5 loops=1)
+   ->  Sort  (cost=46.62..46.65 rows=11 width=41) (actual time=0.043..0.043 rows=5 loops=1)
+         Sort Key: requested_at DESC
+         Sort Method: quicksort  Memory: 25kB
+         ->  Bitmap Heap Scan on trips  (cost=4.51..46.43 rows=11 width=41) (actual time=0.034..0.039 rows=5 loops=1)
+               Recheck Cond: (rider_id = 4242)
+               Heap Blocks: exact=5
+               ->  Bitmap Index Scan on idx_trips_rider_requested  (cost=0.00..4.50 rows=11 width=0) (actual time=0.029..0.029 rows=5 loops=1)
+                     Index Cond: (rider_id = 4242)
+ Planning Time: 0.345 ms
+ Execution Time: 0.056 ms
+(11 rows)
+
+=== Q2 BEFORE ===
+                                                                       QUERY PLAN                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=5826.10..5826.11 rows=1 width=40) (actual time=8.085..10.141 rows=1 loops=1)
+   ->  Gather  (cost=5825.98..5826.09 rows=1 width=40) (actual time=7.825..10.136 rows=2 loops=1)
+         Workers Planned: 1
+         Workers Launched: 1
+         ->  Partial Aggregate  (cost=4825.98..4825.99 rows=1 width=40) (actual time=6.443..6.443 rows=1 loops=2)
+               ->  Nested Loop  (cost=0.42..4825.97 rows=2 width=5) (actual time=2.664..6.433 rows=2 loops=2)
+                     ->  Parallel Seq Scan on trips t  (cost=0.00..4800.65 rows=3 width=4) (actual time=2.642..6.398 rows=2 loops=2)
+                           Filter: ((driver_id = 77) AND (requested_at >= (now() - '7 days'::interval)))
+                           Rows Removed by Filter: 100028
+                     ->  Index Scan using payments_trip_id_key on payments p  (cost=0.42..8.44 rows=1 width=9) (actual time=0.016..0.016 rows=1 loops=4)
+                           Index Cond: (trip_id = t.trip_id)
+                           Filter: ((status)::text = 'paid'::text)
+ Planning Time: 0.387 ms
+ Execution Time: 10.162 ms
+(14 rows)
+
+CREATE INDEX
+=== Q2 AFTER ===
+                                                                  QUERY PLAN                                                                   
+-----------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=66.12..66.13 rows=1 width=40) (actual time=0.065..0.065 rows=1 loops=1)
+   ->  Nested Loop  (cost=4.90..66.10 rows=4 width=5) (actual time=0.041..0.060 rows=4 loops=1)
+         ->  Bitmap Heap Scan on trips t  (cost=4.48..23.90 rows=5 width=4) (actual time=0.036..0.039 rows=4 loops=1)
+               Recheck Cond: ((driver_id = 77) AND (requested_at >= (now() - '7 days'::interval)))
+               Heap Blocks: exact=4
+               ->  Bitmap Index Scan on idx_trips_driver_requested  (cost=0.00..4.47 rows=5 width=0) (actual time=0.033..0.033 rows=4 loops=1)
+                     Index Cond: ((driver_id = 77) AND (requested_at >= (now() - '7 days'::interval)))
+         ->  Index Scan using payments_trip_id_key on payments p  (cost=0.42..8.44 rows=1 width=9) (actual time=0.005..0.005 rows=1 loops=4)
+               Index Cond: (trip_id = t.trip_id)
+               Filter: ((status)::text = 'paid'::text)
+ Planning Time: 0.300 ms
+ Execution Time: 0.083 ms
+(12 rows)
+
+=== Q3 BEFORE ===
+                                                          QUERY PLAN                                                          
+------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=5212.29..5212.75 rows=4 width=23) (actual time=9.505..11.678 rows=10 loops=1)
+   ->  Gather Merge  (cost=5212.29..5212.75 rows=4 width=23) (actual time=9.504..11.677 rows=10 loops=1)
+         Workers Planned: 1
+         Workers Launched: 1
+         ->  Sort  (cost=4212.28..4212.29 rows=4 width=23) (actual time=7.109..7.109 rows=5 loops=2)
+               Sort Key: requested_at
+               Sort Method: quicksort  Memory: 25kB
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               ->  Parallel Seq Scan on trips  (cost=0.00..4212.24 rows=4 width=23) (actual time=7.083..7.085 rows=5 loops=2)
+                     Filter: (((status)::text = 'requested'::text) AND (city_id = 1))
+                     Rows Removed by Filter: 100025
+ Planning Time: 0.025 ms
+ Execution Time: 11.686 ms
+(13 rows)
+
+CREATE INDEX
+=== Q3 AFTER ===
+                                                              QUERY PLAN                                                               
+---------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=31.27..31.29 rows=7 width=23) (actual time=0.025..0.026 rows=10 loops=1)
+   ->  Sort  (cost=31.27..31.29 rows=7 width=23) (actual time=0.025..0.025 rows=10 loops=1)
+         Sort Key: requested_at
+         Sort Method: quicksort  Memory: 25kB
+         ->  Bitmap Heap Scan on trips  (cost=4.19..31.18 rows=7 width=23) (actual time=0.016..0.018 rows=10 loops=1)
+               Recheck Cond: ((city_id = 1) AND ((status)::text = 'requested'::text))
+               Heap Blocks: exact=2
+               ->  Bitmap Index Scan on idx_trips_waiting  (cost=0.00..4.19 rows=7 width=0) (actual time=0.013..0.013 rows=10 loops=1)
+                     Index Cond: (city_id = 1)
+ Planning Time: 0.194 ms
+ Execution Time: 0.039 ms
+(11 rows)
+
+=== Q5 BEFORE (live query over all trips) ===
+                                                        QUERY PLAN                                                         
+---------------------------------------------------------------------------------------------------------------------------
+ HashAggregate  (cost=22224.90..30071.00 rows=200060 width=51) (actual time=62.603..62.771 rows=42 loops=1)
+   Group Key: c.name, (date_trunc('month'::text, t.requested_at))::date
+   Planned Partitions: 4  Batches: 1  Memory Usage: 1561kB
+   ->  Hash Join  (cost=1.14..6345.13 rows=200060 width=21) (actual time=0.010..44.249 rows=200060 loops=1)
+         Hash Cond: (t.city_id = c.city_id)
+         ->  Seq Scan on trips t  (cost=0.00..4447.60 rows=200060 width=22) (actual time=0.003..9.138 rows=200060 loops=1)
+         ->  Hash  (cost=1.06..1.06 rows=6 width=11) (actual time=0.003..0.003 rows=6 loops=1)
+               Buckets: 1024  Batches: 1  Memory Usage: 9kB
+               ->  Seq Scan on cities c  (cost=0.00..1.06 rows=6 width=11) (actual time=0.001..0.002 rows=6 loops=1)
+ Planning Time: 0.260 ms
+ Execution Time: 62.988 ms
+(11 rows)
+
+SELECT 42
+=== Q5 AFTER (reading the materialized view) ===
+                                                       QUERY PLAN                                                       
+------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=26.52..27.32 rows=320 width=222) (actual time=0.021..0.022 rows=42 loops=1)
+   Sort Key: city, month
+   Sort Method: quicksort  Memory: 28kB
+   ->  Seq Scan on city_monthly_stats  (cost=0.00..13.20 rows=320 width=222) (actual time=0.002..0.003 rows=42 loops=1)
+ Planning Time: 0.068 ms
+ Execution Time: 0.027 ms
+(6 rows)
+
+=== Q4 (indexes exist, but a full scan is still chosen) ===
+                                                                              QUERY PLAN                                                                              
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=9113.27..9113.29 rows=10 width=55) (actual time=39.626..42.833 rows=10 loops=1)
+   ->  Sort  (cost=9113.27..9117.02 rows=1500 width=55) (actual time=39.625..42.831 rows=10 loops=1)
+         Sort Key: (sum(p.amount)) DESC
+         Sort Method: top-N heapsort  Memory: 26kB
+         ->  Finalize HashAggregate  (cost=9062.10..9080.85 rows=1500 width=55) (actual time=39.257..42.646 rows=1500 loops=1)
+               Group Key: d.driver_id
+               Batches: 1  Memory Usage: 833kB
+               ->  Gather  (cost=8878.35..9047.10 rows=1500 width=55) (actual time=37.999..41.769 rows=3000 loops=1)
+                     Workers Planned: 1
+                     Workers Launched: 1
+                     ->  Partial HashAggregate  (cost=7878.35..7897.10 rows=1500 width=55) (actual time=35.954..36.202 rows=1500 loops=2)
+                           Group Key: d.driver_id
+                           Batches: 1  Memory Usage: 833kB
+                           Worker 0:  Batches: 1  Memory Usage: 833kB
+                           ->  Hash Join  (cost=4810.27..7753.37 rows=16665 width=20) (actual time=18.639..33.901 rows=13937 loops=2)
+                                 Hash Cond: (t.driver_id = d.driver_id)
+                                 ->  Parallel Hash Join  (cost=4756.52..7655.76 rows=16665 width=9) (actual time=18.412..32.426 rows=13937 loops=2)
+                                       Hash Cond: (p.trip_id = t.trip_id)
+                                       ->  Parallel Seq Scan on payments p  (cost=0.00..2641.92 rows=98028 width=9) (actual time=0.013..8.128 rows=83446 loops=2)
+                                             Filter: ((status)::text = 'paid'::text)
+                                             Rows Removed by Filter: 4405
+                                       ->  Parallel Hash  (cost=4506.44..4506.44 rows=20006 width=8) (actual time=18.238..18.238 rows=16680 loops=2)
+                                             Buckets: 65536  Batches: 1  Memory Usage: 1856kB
+                                             ->  Parallel Seq Scan on trips t  (cost=0.00..4506.44 rows=20006 width=8) (actual time=0.008..15.492 rows=16680 loops=2)
+                                                   Filter: (requested_at >= (now() - '30 days'::interval))
+                                                   Rows Removed by Filter: 83350
+                                 ->  Hash  (cost=35.00..35.00 rows=1500 width=15) (actual time=0.219..0.220 rows=1500 loops=2)
+                                       Buckets: 2048  Batches: 1  Memory Usage: 86kB
+                                       ->  Seq Scan on drivers d  (cost=0.00..35.00 rows=1500 width=15) (actual time=0.016..0.141 rows=1500 loops=2)
+ Planning Time: 0.548 ms
+ Execution Time: 42.886 ms
+(31 rows)
+
+=== Index sizes vs table size ===
+            name            |  size   
+----------------------------+---------
+ trips                      | 19 MB
+ idx_trips_rider_requested  | 6184 kB
+ idx_trips_driver_requested | 6184 kB
+ idx_trips_waiting          | 16 kB
+(4 rows)
+
