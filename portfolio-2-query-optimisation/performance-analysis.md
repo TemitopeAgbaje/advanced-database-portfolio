@@ -21,46 +21,31 @@ Times are the "Execution Time" line from my run, saved in
 | Q5 Monthly city report | Materialized view `city_monthly_stats` | Seq Scan + Hash Aggregate | Seq Scan of 42 stored rows | 62.988 | 0.027 |
 | Q4 Top 10 drivers | None (indexes ignored) | Parallel Seq Scan + Hash Join | Same | 42.886 | n/a |
 
-## What the plans show
+## What I found
 
-### Q1 and Q2: from "read everything" to "jump straight there"
-Before the index, the plan is a **Seq Scan** (sequential scan): PostgreSQL reads all
-~200,000 trips and throws away almost all of them (`Rows Removed by Filter: ~100,000`
-per worker) to find the handful that belong to one rider or one driver.
+### Q1 and Q2: rider and driver lookups
+Before the index, the database was checking through every row to find that rider ID.
+It is like looking for a name in different records with no certainty of where it is,
+so it takes longer. In my run it threw away about 100,000 rows per worker to find
+just 5 trips (48 ms). After adding the index, it went straight to them (0.06 ms).
+Q2 is the same idea for one driver's trips in the last 7 days.
 
-PostgreSQL automatically indexes primary keys and `UNIQUE` columns, but **not
-foreign keys**. So `trips.rider_id` and `trips.driver_id` had no index.
+### Q3: waiting trips (partial index)
+The partial index only stores the waiting trips (`WHERE status = 'requested'`), so it
+is easy to find them and faster to retrieve. It checks only the waiting trips, not
+all 200,000.
 
-After the index, the plan becomes a **Bitmap Index Scan**: the database looks up the
-rider (or driver) in the index, gets the exact rows, and reads only those few pages
-(`Heap Blocks: exact=5`).
+### Q5: monthly report (materialized view)
+An index cannot help here because the report cannot miss any record. It has to check
+every trip. The materialized view saves the answer once, so the report only reads
+42 rows (6 cities × 7 months) instead of 200,000. The catch is that the saved answer
+gets out of date when new trips come in, so it needs refreshing every night with
+`REFRESH MATERIALIZED VIEW city_monthly_stats;`.
 
-The indexes are **composite** (two columns). For Q2, the second column
-(`requested_at`) means the index also handles the "last 7 days" filter, not just
-the driver. Column order matters: the column tested with `=` goes first, the range
-column (`>=`) second.
-
-### Q3: a partial index
-Only about 60 of 200,000 trips are waiting for a driver at any moment. A normal index
-would store all 200,000 rows. The **partial index** (`WHERE status = 'requested'`)
-stores only the waiting ones, so it is tiny (16 kB vs ~6 MB for a full index) and stays
-small however many past trips pile up. This fits the matching service, which runs
-this query constantly.
-
-### Q5: a materialized view instead of an index
-The monthly report has to count **every** trip, so no index can avoid reading the whole
-table. Instead, a **materialized view** saves the finished result (42 rows: 6 cities ×
-7 months). Reading it is near-instant.
-
-Trade-off: the view does not update itself. It must be refreshed, e.g. nightly with
-`REFRESH MATERIALIZED VIEW city_monthly_stats;`. That is fine for a monthly report,
-but would not suit data that must be live.
-
-### Q4: when an index does not help
-Q4 looks at the last 30 days, about **1/6 of all trips**. Even with indexes available,
-the planner still chooses a Seq Scan with Hash Joins. When a query needs a large
-share of a table, reading it straight through is cheaper than thousands of separate
-index lookups. The planner decides this using table statistics (refreshed by `ANALYZE`).
+### Q4: when the index is ignored
+Q4 needs a lot of trips (about 30,000). When you need that many, reading straight
+through the table is faster than using the index to jump to each one. So the database
+was being smart when it ignored the indexes.
 
 ## The cost of indexes
 Indexes are not free:
