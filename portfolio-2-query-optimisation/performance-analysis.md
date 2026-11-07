@@ -10,16 +10,16 @@
 
 ## Results
 
-> Fill in the times from your own run of `optimisation.sql`
-> (the "Execution Time" line at the bottom of each plan).
+Times are the "Execution Time" line from my run, saved in
+[optimisation-output.txt](optimisation-output.txt). Times change a little on each run.
 
 | Query | Optimisation | Plan before | Plan after | Before (ms) | After (ms) |
 |---|---|---|---|---|---|
-| Q1 Rider trip history | Composite index `(rider_id, requested_at DESC)` | Parallel Seq Scan | Bitmap Index Scan | | |
-| Q2 Driver weekly earnings | Composite index `(driver_id, requested_at)` | Parallel Seq Scan | Bitmap Index Scan | | |
-| Q3 Matching queue | Partial index `(city_id, requested_at) WHERE status = 'requested'` | Parallel Seq Scan | Bitmap Index Scan | | |
-| Q5 Monthly city report | Materialized view `city_monthly_stats` | Seq Scan + Hash Aggregate | Seq Scan of 42 stored rows | | |
-| Q4 Top 10 drivers | None (indexes ignored) | Parallel Seq Scan + Hash Join | Same | | n/a |
+| Q1 Rider trip history | Composite index `(rider_id, requested_at DESC)` | Parallel Seq Scan | Bitmap Index Scan | 49.373 | 0.056 |
+| Q2 Driver weekly earnings | Composite index `(driver_id, requested_at)` | Parallel Seq Scan | Bitmap Index Scan | 10.162 | 0.083 |
+| Q3 Matching queue | Partial index `(city_id, requested_at) WHERE status = 'requested'` | Parallel Seq Scan | Bitmap Index Scan | 11.686 | 0.039 |
+| Q5 Monthly city report | Materialized view `city_monthly_stats` | Seq Scan + Hash Aggregate | Seq Scan of 42 stored rows | 62.988 | 0.027 |
+| Q4 Top 10 drivers | None (indexes ignored) | Parallel Seq Scan + Hash Join | Same | 42.886 | n/a |
 
 ## What the plans show
 
