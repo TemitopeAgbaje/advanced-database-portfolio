@@ -47,9 +47,8 @@ Full results and explanation: [performance-analysis.md](performance-analysis.md)
 |---|---|
 | Data generated (row counts) | [1-data-generated.png](screenshots/1-data-generated.png) |
 | Query results | [2-query-results.png](screenshots/2-query-results.png) |
-| Q1 plan before / after index | [3-q1-before.png](screenshots/3-q1-before.png), [4-q1-after.png](screenshots/4-q1-after.png) |
-| Q2 plan before / after index | [5-q2-before.png](screenshots/5-q2-before.png), [6-q2-after.png](screenshots/6-q2-after.png) |
-| Q3 plan before / after partial index | [7-q3-before.png](screenshots/7-q3-before.png), [8-q3-after.png](screenshots/8-q3-after.png) |
-| Q5 before / after materialized view | [9-q5-before.png](screenshots/9-q5-before.png), [10-q5-after.png](screenshots/10-q5-after.png) |
-| Q4 full scan still chosen | [11-q4-no-index.png](screenshots/11-q4-no-index.png) |
-| Index sizes | [12-index-sizes.png](screenshots/12-index-sizes.png) |
+| Q1 plan before / after index | [3-q1-before-after.png](screenshots/3-q1-before-after.png) |
+| Q2 plan before / after index | [4-q2-before-after.png](screenshots/4-q2-before-after.png) |
+| Q3 plan before / after partial index | [5-q3-before-after.png](screenshots/5-q3-before-after.png) |
+| Q5 before / after materialized view | [6-q5-before-after.png](screenshots/6-q5-before-after.png) |
+| Q4 full scan still chosen, and index sizes | [7-q4-and-index-sizes.png](screenshots/7-q4-and-index-sizes.png) |
