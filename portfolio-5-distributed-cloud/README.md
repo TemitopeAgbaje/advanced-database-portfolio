@@ -95,3 +95,16 @@ sharding gives scale and replication gives availability.
   for failover, because money needs strict transactions.
 - Back up every day and test restoring, because replication copies mistakes too (a wrong
   delete is deleted on every node).
+
+## What I found
+- **Replication (demo 1):** We keep 3 copies of the data so that if one server stops,
+  Supalogi is still working and up.
+- **Failover (demo 2):** When the primary went down, 27022 became the new primary, and the
+  riders didn't lose any trips (300 before, 300 after).
+- **Catching up (demo 4):** 27021 was off when trip 301 was booked. When it came back, it
+  restored the missing trip from the other nodes and had 301 trips too.
+- **No majority (demo 5):** Refusing to save trips is bad, because it affects the user
+  experience, but it stops two servers each acting as the primary and saving different
+  trips, so the data stays correct.
+- **Sharding:** Splitting Lagos, Abuja and Accra onto different servers means downtime is
+  specific and only affects certain places, not every city at once.
