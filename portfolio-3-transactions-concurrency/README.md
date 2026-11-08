@@ -43,3 +43,20 @@ Needs the Portfolio 2 data loaded (`generate-data.sql`).
 | Read committed: fare changes inside one transaction | [8-read-committed.png](screenshots/8-read-committed.png) |
 | Repeatable read: fare stays the same | [9-repeatable-read.png](screenshots/9-repeatable-read.png) |
 | Repeatable read: update refused | [10-serialize-error.png](screenshots/10-serialize-error.png) |
+
+## What I found
+
+**1. Commit.** When a trip ends, the trip, payment and driver tables all need to update.
+If only one updated, the data wouldn't match (e.g. a completed trip with no payment).
+A transaction makes sure they all update together, or none do.
+
+**2. Rollback.** A transaction is all or nothing. When the payment had an error, the whole
+transaction group was cancelled, so the trip update was undone too.
+
+**3. Double booking.** Without a lock, both drivers saw the ride as free, and driver 21
+overwrote driver 20 (a lost update). With `FOR UPDATE`, driver 21 had to wait until
+driver 20 finished, then saw the ride was already taken.
+
+**4. Isolation.** In read committed, Tab A saw the fare change from 3000 to 4500 inside the
+same transaction. In repeatable read, Tab A kept seeing 3000, like a photo, and the
+database blocked its update because the data had changed.
