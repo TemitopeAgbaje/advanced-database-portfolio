@@ -16,4 +16,4 @@ uses this same case study.
 | [portfolio-2-query-optimisation](portfolio-2-query-optimisation/) | Query Processing and Optimisation |
 | [portfolio-3-transactions-concurrency](portfolio-3-transactions-concurrency/) | Transactions and Concurrency |
 | [portfolio-4-nosql](portfolio-4-nosql/) | NoSQL and Advanced Data Models |
-| portfolio-5-distributed-cloud | Distributed and Cloud Database Exercise |
+| [portfolio-5-distributed-cloud](portfolio-5-distributed-cloud/) | Distributed and Cloud Database Exercise |
