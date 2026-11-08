@@ -7,14 +7,14 @@ INSERT INTO cities (name, country) VALUES
     ('Accra', 'Ghana');
 
 INSERT INTO riders (full_name, email, phone) VALUES
-    ('Ada Obi',     'ada@mail.com',   '+2348010000001'),
-    ('Bola Ade',    'bola@mail.com',  '+2348010000002'),
-    ('Chidi Nwosu', 'chidi@mail.com', '+2348010000003');
+    ('Feranmi Oluwase', 'feranmi@mail.com', '+2348010000001'),
+    ('Olayide Abass',   'olayide@mail.com', '+2348010000002'),
+    ('Dongo Manchi',    'dongo@mail.com',   '+2348010000003');
 
 INSERT INTO drivers (full_name, email, phone, license_no, status) VALUES
-    ('Emeka Udo',  'emeka@mail.com',  '+2348020000001', 'LIC-001', 'available'),
-    ('Funke Ola',  'funke@mail.com',  '+2348020000002', 'LIC-002', 'available'),
-    ('Kwame Mensah','kwame@mail.com',  '+2348020000003', 'LIC-003', 'offline');
+    ('Seun Olajeyi',    'seun@mail.com',     '+2348020000001', 'LIC-001', 'available'),
+    ('Tayo Makayu',     'tayo@mail.com',     '+2348020000002', 'LIC-002', 'available'),
+    ('Chibuzor Emeka',  'chibuzor@mail.com', '+2348020000003', 'LIC-003', 'offline');
 
 INSERT INTO vehicles (driver_id, plate_no, make, model, color, year) VALUES
     (1, 'LAG-123AA', 'Toyota',  'Corolla', 'Silver', 2019),
