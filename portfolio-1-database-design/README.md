@@ -20,6 +20,16 @@ handles trips and payments, and collects ratings. Full description: [case-study.
 - **payments** — one payment per trip
 - **ratings** — rider and driver each rate a trip once
 
+## Keys and constraints
+- **Primary key:** identifies a certain row, e.g. `trip_id` picks out one trip. No two
+  rows can share it.
+- **Foreign key:** `trips.rider_id` points to `riders.rider_id`. Adding a trip for a rider
+  who doesn't exist throws an error, so every trip belongs to a registered, valid rider.
+- **UNIQUE:** `payments.trip_id` is unique, so a trip can only have one payment.
+- **CHECK:** only allows values that pass a test. A rating of 7 is rejected because of
+  `CHECK (score BETWEEN 1 AND 5)`, and a payment of -2800 is rejected because of
+  `CHECK (amount >= 0)` (tested in Portfolio 3).
+
 ## How to run
 ```bash
 createdb -U postgres supalogi
