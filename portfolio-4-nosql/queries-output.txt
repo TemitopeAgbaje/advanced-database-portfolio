@@ -1,0 +1,199 @@
+
+=== Q1: one trip with everything (no joins) ===
+{
+  _id: 1,
+  city: 'Lagos',
+  status: 'completed',
+  rider: {
+    id: 1,
+    name: 'Feranmi Oluwase'
+  },
+  driver: {
+    id: 1,
+    name: 'Seun Olajeyi',
+    plate: 'SPL-00001'
+  },
+  pickup: {
+    area: 'Yaba',
+    location: {
+      type: 'Point',
+      coordinates: [
+        3.3792,
+        6.5095
+      ]
+    }
+  },
+  dropoff: {
+    area: 'Lekki',
+    location: {
+      type: 'Point',
+      coordinates: [
+        3.4746,
+        6.4474
+      ]
+    }
+  },
+  fare: 4200,
+  requested_at: ISODate('2026-11-08T12:46:22.021Z'),
+  started_at: ISODate('2026-11-08T12:54:22.021Z'),
+  ended_at: ISODate('2026-11-08T13:31:22.021Z'),
+  payment: {
+    method: 'card',
+    status: 'paid',
+    paid_at: ISODate('2026-11-08T13:31:22.021Z')
+  },
+  ratings: [
+    {
+      from: 'rider',
+      score: 5,
+      comment: 'Smooth ride'
+    },
+    {
+      from: 'driver',
+      score: 5
+    }
+  ],
+  status_history: [
+    {
+      status: 'requested',
+      at: ISODate('2026-11-08T12:46:22.021Z')
+    },
+    {
+      status: 'accepted',
+      at: ISODate('2026-11-08T12:48:22.021Z')
+    },
+    {
+      status: 'ongoing',
+      at: ISODate('2026-11-08T12:54:22.021Z')
+    },
+    {
+      status: 'completed',
+      at: ISODate('2026-11-08T13:31:22.021Z')
+    }
+  ]
+}
+
+=== Q2: nearest available drivers to a rider in Yaba (matching) ===
+[
+  {
+    name: 'Emeka Akande',
+    plate: 'SPL-00048',
+    distance_m: 709
+  },
+  {
+    name: 'Kofi Ogunleye',
+    plate: 'SPL-00015',
+    distance_m: 2491
+  },
+  {
+    name: 'Chibuzor Emeka',
+    plate: 'SPL-00003',
+    distance_m: 3026
+  }
+]
+
+=== Q3: a rider's latest trips, with and without the index ===
+[
+  {
+    _id: 1,
+    city: 'Lagos',
+    status: 'completed',
+    fare: 4200,
+    requested_at: ISODate('2026-11-08T12:46:22.021Z')
+  },
+  {
+    _id: 4401,
+    city: 'Lagos',
+    requested_at: ISODate('2026-11-07T23:15:17.820Z'),
+    status: 'completed',
+    fare: 6190
+  },
+  {
+    _id: 3159,
+    city: 'Abuja',
+    requested_at: ISODate('2026-11-07T19:55:42.947Z'),
+    status: 'completed',
+    fare: 3870
+  },
+  {
+    _id: 1600,
+    city: 'Abuja',
+    requested_at: ISODate('2026-11-06T11:58:58.568Z'),
+    status: 'cancelled'
+  },
+  {
+    _id: 2139,
+    city: 'Accra',
+    requested_at: ISODate('2026-11-05T21:42:32.103Z'),
+    status: 'completed',
+    fare: 1630
+  }
+]
+without index: stage=COLLSCAN, docsExamined=5000, returned=5, timeMs=13
+with index   : stage=IXSCAN, docsExamined=5, returned=5, timeMs=0
+
+=== Q4: trips and revenue per city (aggregation pipeline) ===
+[
+  {
+    trips: 1412,
+    revenue: 7495640,
+    city: 'Lagos',
+    avg_fare: 5309
+  },
+  {
+    trips: 1411,
+    revenue: 7445240,
+    city: 'Abuja',
+    avg_fare: 5277
+  },
+  {
+    trips: 1395,
+    revenue: 7408220,
+    city: 'Accra',
+    avg_fare: 5311
+  }
+]
+
+=== Q5: flexible schema ===
+[
+  {
+    _id: 2,
+    stops: [
+      {
+        area: 'Garki',
+        location: {
+          type: 'Point',
+          coordinates: [
+            7.4833,
+            9.0333
+          ]
+        }
+      }
+    ],
+    promo_code: 'SUPA20'
+  }
+]
+trips with no payment field: 546
+cancelled trips:             546
+
+=== Q6: two drivers accept the same ride (atomic update) ===
+Seun accepts:  got the ride
+Chibuzor accepts: ride already taken
+{
+  _id: 9001,
+  status: 'accepted',
+  status_history: [
+    {
+      status: 'requested',
+      at: ISODate('2026-11-08T14:16:44.167Z')
+    },
+    {
+      status: 'accepted',
+      at: ISODate('2026-11-08T14:16:44.173Z')
+    }
+  ],
+  driver: {
+    id: 1,
+    name: 'Seun Olajeyi'
+  }
+}

@@ -70,9 +70,28 @@ mongosh supalogi queries.js | tee queries-output.txt
 | Test | Evidence |
 |---|---|
 | Data loaded (counts) | [1-data-loaded.png](screenshots/1-data-loaded.png) |
-| A full trip document in Compass | [2-trip-document.png](screenshots/2-trip-document.png) |
+| Q1 one full trip document (no joins) | [2-trip-document.png](screenshots/2-trip-document.png), [2-trip-document-2.png](screenshots/2-trip-document-2.png) |
 | Q2 nearest drivers | [3-nearest-drivers.png](screenshots/3-nearest-drivers.png) |
 | Q3 index vs full scan | [4-index-vs-scan.png](screenshots/4-index-vs-scan.png) |
 | Q4 revenue per city | [5-aggregation.png](screenshots/5-aggregation.png) |
 | Q5 flexible schema | [6-flexible-schema.png](screenshots/6-flexible-schema.png) |
 | Q6 only one driver gets the ride | [7-atomic-accept.png](screenshots/7-atomic-accept.png) |
+
+## What I found
+- **One trip, no joins (Q1):** In PostgreSQL, showing one trip needed 5 joins. MongoDB
+  needs fewer reads because everything is connected and added inside the trip document.
+- **Nearest driver (Q2):** Finding the nearest driver means the rider waits less and the
+  driver drives a shorter distance to pick them up.
+- **Index (Q3):** Without the index MongoDB read all 5,000 trips to find 5. With the index it
+  read only 5 (13 ms down to 0 ms), the same idea as Portfolio 2.
+- **Flexible schema (Q5):** Adding something new to some trips, like stops or a promo code,
+  is easy because MongoDB is flexible and uses documents. Cancelled trips simply have no
+  payment field (546 cancelled = 546 with no payment).
+- **Double booking (Q6):** In Portfolio 3 I needed BEGIN, a lock and ROLLBACK. In MongoDB it
+  was one step, because the update only works if the ride is still requested. Seun got the
+  ride and Chibuzor got "ride already taken".
+- **Downside:** The rider's name is copied into every trip, and the copy does not update on
+  its own. But the trip also keeps the rider's id, so we can always look up the right name.
+- **Which one for Supalogi:** Both. PostgreSQL for payments, where money must be exact and
+  safe (Portfolio 3), and MongoDB for trips and finding nearby drivers, where speed and
+  flexibility matter.
