@@ -22,12 +22,35 @@ function near(coords) {
 }
 
 // ---------------------------------------------------------------------------
+// names: the first 3 riders and drivers match seed.sql (Portfolio 1),
+// the rest are built from first name + surname so every person has a real name
+// ---------------------------------------------------------------------------
+const surnames = ['Adeyemi', 'Okafor', 'Bello', 'Mensah', 'Eze', 'Ibrahim', 'Owusu', 'Balogun',
+  'Nwosu', 'Danjuma', 'Asante', 'Ogunleye', 'Usman', 'Boateng', 'Akande'];
+const riderFirst = ['Adaeze', 'Bola', 'Chidi', 'Damilola', 'Efe', 'Funmi', 'Gbenga', 'Halima', 'Ifeoma', 'Jide',
+  'Kemi', 'Kwame', 'Lola', 'Musa', 'Ngozi', 'Obinna', 'Ama', 'Segun', 'Tolu', 'Yaw'];
+const driverFirst = ['Ade', 'Babatunde', 'Chinedu', 'Dayo', 'Emeka', 'Femi', 'Ganiyu', 'Hassan', 'Ikenna', 'Kojo',
+  'Kunle', 'Kofi', 'Lanre', 'Mohammed', 'Nnamdi', 'Olu', 'Rasheed', 'Sani', 'Uche', 'Yusuf'];
+
+function riderName(i) {
+  const fixed = ['Feranmi Oluwase', 'Olayide Abass', 'Dongo Manchi'];
+  if (i <= 3) return fixed[i - 1];
+  const k = i - 4;                                   // 0..196, every pair is different
+  return riderFirst[k % 20] + ' ' + surnames[Math.floor(k / 20)];
+}
+function driverName(i) {
+  const fixed = ['Seun Olajeyi', 'Tayo Makayu', 'Chibuzor Emeka'];
+  if (i <= 3) return fixed[i - 1];
+  const k = i - 4;                                   // 0..56, every pair is different
+  return driverFirst[k % 20] + ' ' + surnames[k % 15];
+}
+
+// ---------------------------------------------------------------------------
 // riders: profile only. Saved places is an array - not every rider has one.
 // ---------------------------------------------------------------------------
-const riderNames = ['Feranmi Oluwase', 'Olayide Abass', 'Dongo Manchi'];
 const riders = [];
 for (let i = 1; i <= 200; i++) {
-  const rider = { _id: i, name: riderNames[i - 1] || 'Rider ' + i, phone: '+23480' + String(i).padStart(8, '0') };
+  const rider = { _id: i, name: riderName(i), phone: '+23480' + String(i).padStart(8, '0') };
   if (i % 3 === 0) {
     rider.saved_places = [{ label: 'Home', area: 'Yaba' }, { label: 'Work', area: 'Lekki' }];
   }
@@ -38,13 +61,12 @@ db.riders.insertMany(riders);
 // ---------------------------------------------------------------------------
 // drivers: the vehicle is embedded (one car per driver) and so is the live location
 // ---------------------------------------------------------------------------
-const driverNames = ['Seun Olajeyi', 'Tayo Makayu', 'Chibuzor Emeka'];
 const drivers = [];
 for (let i = 1; i <= 60; i++) {
   const city = cityNames[i % 3];
   drivers.push({
     _id: i,
-    name: driverNames[i - 1] || 'Driver ' + i,
+    name: driverName(i),
     city: city,
     status: pick(['available', 'available', 'on_trip', 'offline']),
     vehicle: { plate: 'SPL-' + String(i).padStart(5, '0'), make: pick(['Toyota', 'Honda', 'Kia']), color: pick(['Black', 'Silver', 'White']) },
